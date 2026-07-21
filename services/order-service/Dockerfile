@@ -15,4 +15,6 @@ COPY services/order-service/app ./app
 
 EXPOSE 8001
 
+ENV PYTHONUNBUFFERED=1
+
 CMD ["/app/.venv/bin/uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]

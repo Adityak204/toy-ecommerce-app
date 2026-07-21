@@ -48,7 +48,7 @@ def process_order_notification(ch, method, properties, body):
         product_id = order_data.get("product_id")
         quantity = order_data.get("quantity")
         status = order_data.get("status")
-
+        time.sleep(3)
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         # Simulate sending an email notification
         print(f"\n{'='*60}")
