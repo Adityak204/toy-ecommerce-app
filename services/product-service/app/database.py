@@ -1,5 +1,9 @@
 from typing import Dict, List, Optional
+import logging
 from app.models import Product
+
+# Get logger for this module
+logger = logging.getLogger(__name__)
 
 # In-memory database simulation
 products_db: Dict[int, Product] = {}
@@ -25,20 +29,45 @@ def intitalize_sample_data():
         {"name": "Wireless Mouse", "description": "A wireless mouse for computers", "price": 29.99, "stock_quantity": 60},
     ]
     
-    for product in sample_products:
-        product = Product(id=_next_id, **product)
+    for product_data in sample_products:
+        product = Product(id=_next_id, **product_data)
         products_db[_next_id] = product
+        logger.debug(
+            "Sample product loaded",
+            extra={
+                "event": "sample_product_loaded",
+                "product_id": _next_id,
+                "product_name": product_data["name"],
+            }
+        )
         _next_id += 1 
 
 
 def get_all_products() -> List[Product]:
     """Retrieve all products from the in-memory database."""
-    return list(products_db.values())
+    products = list(products_db.values())
+    logger.debug(
+        "All products retrieved",
+        extra={
+            "event": "all_products_retrieved",
+            "product_count": len(products),
+        }
+    )
+    return products
 
 
 def get_product_by_id(product_id: int) -> Optional[Product]:
     """Retrieve a product by its ID from the in-memory database."""
-    return products_db.get(product_id)
+    product = products_db.get(product_id)
+    logger.debug(
+        "Product retrieved",
+        extra={
+            "event": "product_retrieved",
+            "product_id": product_id,
+            "found": product is not None,
+        }
+    )
+    return product
 
 
 def create_product(name: str, description: str, price: float, stock_quantity: int) -> Product:
@@ -48,5 +77,13 @@ def create_product(name: str, description: str, price: float, stock_quantity: in
     
     product = Product(id=_next_id, name=name, description=description, price=price, stock_quantity=stock_quantity)
     products_db[_next_id] = product
+    logger.debug(
+        "Product created in database",
+        extra={
+            "event": "product_created",
+            "product_id": _next_id,
+            "product_name": name,
+        }
+    )
     _next_id += 1
     return product
