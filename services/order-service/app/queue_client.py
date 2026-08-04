@@ -1,7 +1,12 @@
 import pika
 import json
 import os
+import logging
 from typing import Dict, Any
+from app.log_context import get_correlation_id
+
+# Get logger for this module
+logger = logging.getLogger(__name__)
 
 
 def get_rabbitmq_connection() -> pika.BlockingConnection:
@@ -30,8 +35,15 @@ def publish_order_notification(order_data: Dict[Any, Any]) -> bool:
         # Declare queue (idempotent operation, will only create if it doesn't exist)
         channel.queue_declare(queue='orders', durable=True)
 
+        # Add correlation id to the message
+        correlation_id = get_correlation_id()
+        message_payload = {
+            "correlation_id": correlation_id,
+            "order_data": order_data
+        }
+
         # Publish the message
-        message = json.dumps(order_data, default=str)
+        message = json.dumps(message_payload, default=str)
         channel.basic_publish(
             exchange='',
             routing_key='orders',
@@ -42,7 +54,15 @@ def publish_order_notification(order_data: Dict[Any, Any]) -> bool:
             )
         )
 
-        print(f"[x] Sent order notification: {order_data['id']}")
+        logger.info(
+            "Order notification published",
+            extra={
+                "event": "order_notification_published",
+                "correlation_id": correlation_id,
+                "order_id": order_data["id"],
+                "queue": "orders",
+            }
+        )
 
         connection.close()
         return True
