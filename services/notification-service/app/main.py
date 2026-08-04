@@ -1,8 +1,16 @@
 from fastapi import FastAPI
 from threading import Thread
 import time
+import logging
 
 from app.queue_consumer import start_consuming
+from app.logging_config import setup_logging
+
+# Configure logging
+setup_logging()
+
+# Get logger for this module
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Notification Service", version="1.0.0")
 
@@ -23,7 +31,13 @@ async def startup_event():
     consumer_thread = Thread(target=run_consumer, daemon=True)
     consumer_thread.start()
 
-    print("Notification Service started and background consumer thread initiated.")
+    logger.info(
+        "Notification Service started and background consumer thread initiated.",
+        extra={
+            "event": "notification_service_started",
+            "queue": "orders",
+        }
+    )
 
 
 @app.get("/health")
