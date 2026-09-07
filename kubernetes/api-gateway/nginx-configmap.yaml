@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: ecommerce
+data:
+  nginx.conf: |
+    events{
+        worker_connections 1024;
+    }
+
+    http {
+        upstream product_backend {
+            server product-service:8000;
+        }
+
+        upstream order_backend {
+            server order-service:8001;
+        }
+
+
+        server {
+            listen 80;
+            server_name localhost;
+
+            # Health check endpoint
+            location /health {
+                access_log off;
+                return 200 'healthy\n';
+                add_header Content-Type text/plain;
+            }
+
+            # Product Service routes
+            location /api/products {
+                proxy_pass http://product_backend/products;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+
+            # Order Service routes
+            location /api/orders {
+                proxy_pass http://order_backend/orders;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+
+            # Root endpoint
+            location / {
+                return 200 '{"message": "Ecommerce API Gateway", "endpoints": ["/api/products", "/api/orders"]}';
+                add_header Content-Type application/json;              
+              }
+          }
+      }
