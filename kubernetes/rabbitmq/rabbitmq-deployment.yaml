@@ -37,21 +37,21 @@ spec:
             limits:
               cpu: "500m"
               memory: "256Mi"
-            livenessProbe:
-              exec:
-                command:
-                  - rabbitmq-diagnostics
-                  - -q
-                  - ping
-              initialDelaySeconds: 60
-              periodSeconds: 30
-              timeoutSeconds: 10
-            readinessProbe:
-              exec:
-                command:
-                  - rabbitmq-diagnostics
-                  - -q
-                  - check_port_connectivity
-              initialDelaySeconds: 20
-              periodSeconds: 10
-              timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - -q
+                - ping
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - -q
+                - check_port_connectivity
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
