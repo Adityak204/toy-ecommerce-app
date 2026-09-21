@@ -8,3 +8,12 @@ wheels/
 
 # Virtual environments
 .venv
+
+# keys
+keys/
+
+# pem file
+*.pem
+
+# .DS_Store
+.DS_Store
