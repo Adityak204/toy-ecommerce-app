@@ -1,8 +1,8 @@
 import os
 from datetime import datetime, timedelta, timezone
 
-from jose import jwt
-from passlib.context import CryptContext
+from jose import jwt, jwk
+from pwdlib import PasswordHash
 
 
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "RS256")
@@ -12,7 +12,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
 PRIVATE_KEY_PATH = os.getenv("PRIVATE_KEY_PATH", "/app/keys/private_key.pem") # ./keys/private_key.pem
 PUBLIC_KEY_PATH = os.getenv("PUBLIC_KEY_PATH", "/app/keys/public_key.pem") # ./keys/public_key.pem
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = PasswordHash.recommended()
 
 
 def hash_password(password: str) -> str:
@@ -39,7 +39,7 @@ def create_access_token(subject:str) -> str:
 def get_jwks() -> dict:
     """Build the JWKS response from the public key."""
     public_key = _read_key(PUBLIC_KEY_PATH)
-    jwt_dict = jwt.construct(public_key, JWT_ALGORITHM).to_dict()
+    jwt_dict = jwk.construct(public_key, JWT_ALGORITHM).to_dict()
     jwt_dict["kid"] = JWT_KID
     jwt_dict["use"] = "sig"
     jwt_dict["alg"] = JWT_ALGORITHM
