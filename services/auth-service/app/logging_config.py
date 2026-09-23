@@ -50,7 +50,7 @@ class CorrelationIdFilter(logging.Filter):
     and adds it to the log entry
     """
 
-    def __init__(self, correlation_id: str):
+    def __init__(self,):
         super().__init__()
 
     def filter(self, record: logging.LogRecord) -> bool:
@@ -149,7 +149,7 @@ class PrettyFormatter(logging.Formatter):
             f"{timestamp} | "
             f"{color}{record.levelname:8}{reset} | "
             f"{service:20} | "
-            f"{correlation_id:36} | "
+            f"{correlation_id or '-':36} | "
             f"{record.getMessage()}"
         )
 
