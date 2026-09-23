@@ -6,10 +6,10 @@ from app.models import UserCreate, UserResponse, Token
 from app.database import create_user, get_user_by_email
 from app.security import hash_password, verify_password, create_access_token, get_jwks
 from app.logging_config import setup_logging
-# from app.middleware.logging_middleware import LoggingMiddleware
+from app.middleware.logging_middleware import LoggingMiddleware
 
-# COnfigure logging
-# setup_logging() # TODO: Fix logging
+# Configure logging
+setup_logging()
 
 # Get logger for this module
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(title="Auth Service", version="1.0.0")
 
 # Add logging middleware
-# app.add_middleware(LoggingMiddleware) # TODO: Fix logging
+app.add_middleware(LoggingMiddleware)
 
 
 @app.on_event("startup")
